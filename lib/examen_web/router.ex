@@ -18,6 +18,7 @@ defmodule ExamenWeb.Router do
 
     get "/", PageController, :index
     resources "/authors", AuthorController
+    resources "/libraries", LibraryController
   end
 
   # Other scopes may use custom stacks.
