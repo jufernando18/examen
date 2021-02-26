@@ -5,6 +5,7 @@ defmodule Examen.HelperLibraries.Library do
   schema "libraries" do
     field :address, :string
     field :name, :string
+    has_many :books, Examen.HelperBooks.Book
 
     timestamps()
   end
