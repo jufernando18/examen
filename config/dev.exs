@@ -5,7 +5,7 @@ config :examen, Examen.Repo,
   username: "postgres",
   password: "postgres",
   database: "examen_dev",
-  hostname: "172.30.101.105",
+  hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
