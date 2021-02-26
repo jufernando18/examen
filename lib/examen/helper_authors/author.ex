@@ -7,6 +7,7 @@ defmodule Examen.HelperAuthors.Author do
     field :email, :string
     field :first_name, :string
     field :last_name, :string
+    has_many :books, Examen.HelperBooks.Book
 
     timestamps()
   end
