@@ -1,15 +1,18 @@
 defmodule Examen.HelperAuthorsTest do
   use Examen.DataCase
+  use ExUnit.Case
 
+  #alias Ecto.Changeset
   alias Examen.HelperAuthors
+  alias Examen.HelperAuthors.Author
+
+  import Examen.Factory
+
+  @valid_attrs %{age: 42, email: "some email", first_name: "some first_name", last_name: "some last_name"}
+  @update_attrs %{age: 43, email: "some updated email", first_name: "some updated first_name", last_name: "some updated last_name"}
+  @invalid_attrs %{age: nil, email: nil, first_name: nil, last_name: nil}
 
   describe "authors" do
-    alias Examen.HelperAuthors.Author
-
-    @valid_attrs %{age: 42, email: "some email", first_name: "some first_name", last_name: "some last_name"}
-    @update_attrs %{age: 43, email: "some updated email", first_name: "some updated first_name", last_name: "some updated last_name"}
-    @invalid_attrs %{age: nil, email: nil, first_name: nil, last_name: nil}
-
     def author_fixture(attrs \\ %{}) do
       {:ok, author} =
         attrs
@@ -65,6 +68,32 @@ defmodule Examen.HelperAuthorsTest do
     test "change_author/1 returns a author changeset" do
       author = author_fixture()
       assert %Ecto.Changeset{} = HelperAuthors.change_author(author)
+    end
+  end
+
+
+  describe "database_mock" do
+    test "insert/1" do
+      assert {:error, %Ecto.Changeset{errors: [age: {"can't be blank", [validation: :required]}] ,valid?: false}} = HelperAuthors.create_author(%{@valid_attrs | age: nil})
+      assert %Ecto.Changeset{valid?: true} = HelperAuthors.change_author(%Author{}, @valid_attrs)
+      assert {:ok, author} = HelperAuthors.create_author(@valid_attrs)
+      assert HelperAuthors.get_author!(author.id) == author
+    end
+
+    test "insert/1 and update/2" do
+      author = insert(:author, @valid_attrs)
+      assert {:error, %Ecto.Changeset{errors: [age: {"can't be blank", [validation: :required]}] ,valid?: false}} = HelperAuthors.update_author(author, %{@update_attrs | age: nil})
+      assert_raise Ecto.NoPrimaryKeyValueError, fn -> HelperAuthors.update_author( %{author | id: nil}, @update_attrs) end
+      assert %Ecto.Changeset{changes: @update_attrs,valid?: true} = Author.changeset(author, @update_attrs)
+      {:ok, _} =  HelperAuthors.update_author(author, @update_attrs)
+      %Ecto.Changeset{changes: changes,valid?: true} = Author.changeset(HelperAuthors.get_author!(author.id), @update_attrs)
+      assert map_size(changes) == 0
+    end
+
+    test "delete/1" do
+      author = insert(:author, @valid_attrs)
+      assert_raise Ecto.NoPrimaryKeyValueError, fn -> HelperAuthors.delete_author(%{author | id: nil}) end
+      assert {:ok, _} = HelperAuthors.delete_author(author)
     end
   end
 end
